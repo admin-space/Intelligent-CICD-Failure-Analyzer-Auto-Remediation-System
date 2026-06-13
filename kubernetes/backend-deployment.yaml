@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudwise-backend
+  namespace: cloudwise
+  labels:
+    app: cloudwise-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudwise-backend
+  template:
+    metadata:
+      labels:
+        app: cloudwise-backend
+    spec:
+      containers:
+      - name: backend
+        image: cloudwise-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: cloudwise-config
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudwise-backend
+  namespace: cloudwise
+spec:
+  selector:
+    app: cloudwise-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cloudwise-db
+  namespace: cloudwise
+spec:
+  serviceName: "cloudwise-db-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudwise-db
+  template:
+    metadata:
+      labels:
+        app: cloudwise-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: cloudwise
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: db-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudwise-db-service
+  namespace: cloudwise
+spec:
+  selector:
+    app: cloudwise-db
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

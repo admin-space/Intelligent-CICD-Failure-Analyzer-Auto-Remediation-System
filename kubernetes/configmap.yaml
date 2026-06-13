@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudwise-config
+  namespace: cloudwise
+data:
+  ENVIRONMENT: "production"
+  DEMO_MODE: "true"
+  DATABASE_URL: "postgresql://postgres:postgres@cloudwise-db-service:5432/cloudwise"
+  AI_PROVIDER: "local"
+  VECTOR_DB_PATH: "/data/chroma"
